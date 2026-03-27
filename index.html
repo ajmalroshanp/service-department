@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Service Department Management System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:240px;background:linear-gradient(180deg,#1F3864 0%,#16213e 100%);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:width .25s;overflow:hidden}
+.sidebar.collapsed{width:60px}
+.sidebar-logo{padding:18px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.1);min-height:64px}
+.logo-icon{width:32px;height:32px;background:#2E75B6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo-text{font-size:13px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden}
+.logo-text span{display:block;font-size:10px;font-weight:400;opacity:.6}
+.sidebar-toggle{background:none;border:none;color:#fff;cursor:pointer;padding:4px 8px;margin-left:auto;font-size:18px;flex-shrink:0}
+.sidebar nav{flex:1;padding:12px 0;overflow-y:auto}
+.nav-section{padding:8px 16px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.45;white-space:nowrap;overflow:hidden}
+.sidebar.collapsed .nav-section{opacity:0}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .18s;white-space:nowrap;overflow:hidden;font-size:13.5px}
+.nav-item:hover{background:rgba(255,255,255,.08)}
+.nav-item.active{background:rgba(46,117,182,.35);border-left-color:#5BB4F0}
+.nav-icon{font-size:17px;flex-shrink:0;width:22px;text-align:center}
+.nav-label{white-space:nowrap;overflow:hidden}
+.sidebar.collapsed .nav-label{opacity:0;width:0}
+.nav-badge{margin-left:auto;background:#2E75B6;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;flex-shrink:0}
+.sidebar.collapsed .nav-badge{display:none}
+.sidebar-footer{padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);font-size:11px;opacity:.5;white-space:nowrap;overflow:hidden}
+.main{margin-left:240px;transition:margin-left .25s;flex:1;display:flex;flex-direction:column}
+.main.shifted{margin-left:60px}
+.topbar{background:#fff;padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.08);position:sticky;top:0;z-index:50}
+.topbar-title h1{font-size:18px;font-weight:700;color:#1F3864}
+.topbar-title p{font-size:12px;color:#888}
+.topbar-actions{display:flex;gap:10px;align-items:center}
+.badge-date{font-size:12px;background:#f0f2f5;padding:4px 12px;border-radius:20px;color:#555}
+.cloud-badge{font-size:11px;background:#e8f5e9;color:#2e7d32;padding:4px 10px;border-radius:20px;font-weight:600;display:flex;align-items:center;gap:4px}
+.cloud-badge.offline{background:#fce4d6;color:#b71c1c}
+.page{padding:24px 28px;flex:1}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-top:4px solid;position:relative;overflow:hidden}
+.kpi-card::after{content:attr(data-icon);position:absolute;right:12px;top:12px;font-size:28px;opacity:.12}
+.kpi-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:#888;margin-bottom:6px}
+.kpi-value{font-size:28px;font-weight:800;line-height:1}
+.kpi-sub{font-size:12px;color:#888;margin-top:6px}
+.kpi-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.kpi-chip{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.chart-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.chart-title{font-size:14px;font-weight:700;color:#1F3864;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.chart-title .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.chart-wrap{height:200px;position:relative}
+.pipeline-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:24px}
+.pipeline-title{font-size:14px;font-weight:700;color:#1F3864;margin-bottom:16px}
+.pipeline-steps{display:flex;align-items:center}
+.pipe-step{flex:1;text-align:center;padding:12px 8px;border-radius:8px;color:#fff;font-size:12px;font-weight:700}
+.pipe-arrow{color:#aaa;font-size:20px;padding:0 6px;flex-shrink:0}
+.pipe-count{font-size:22px;font-weight:800;display:block}
+.module-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.module-title{display:flex;align-items:center;gap:10px}
+.module-title h2{font-size:20px;font-weight:700}
+.module-badge{font-size:11px;padding:3px 10px;border-radius:12px;font-weight:700;color:#fff}
+.module-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:all .18s}
+.btn-primary{background:#1F3864;color:#fff}
+.btn-primary:hover{background:#2E75B6}
+.btn-success{background:#548235;color:#fff}
+.btn-success:hover{background:#375623}
+.btn-outline{background:#fff;color:#1F3864;border:1.5px solid #1F3864}
+.btn-outline:hover{background:#f0f4ff}
+.btn-danger{background:#C00000;color:#fff}
+.btn-danger:hover{background:#900000}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-icon{padding:6px 10px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.filters-bar{background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.filter-group{display:flex;align-items:center;gap:6px}
+.filter-group label{font-size:12px;font-weight:600;color:#555;white-space:nowrap}
+.filter-input{padding:6px 10px;border:1.5px solid #dde;border-radius:7px;font-size:13px;outline:none;transition:border .15s;min-width:140px}
+.filter-input:focus{border-color:#2E75B6}
+.filter-select{padding:6px 10px;border:1.5px solid #dde;border-radius:7px;font-size:13px;outline:none;background:#fff;min-width:130px;cursor:pointer}
+.filter-clear{background:none;border:none;color:#2E75B6;cursor:pointer;font-size:12px;font-weight:600}
+.table-wrap{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden}
+.table-info{padding:12px 18px;font-size:12px;color:#888;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:#1F3864;color:#fff;padding:12px 14px;text-align:left;font-size:12px;font-weight:600;white-space:nowrap;position:sticky;top:0}
+tbody tr{border-bottom:1px solid #f5f5f5;transition:background .12s}
+tbody tr:hover{background:#f8faff}
+tbody tr:nth-child(even){background:#fafafa}
+tbody tr:nth-child(even):hover{background:#f2f5ff}
+td{padding:10px 14px;vertical-align:middle}
+.id-chip{font-size:11px;font-weight:700;background:#eef2ff;color:#1F3864;padding:2px 8px;border-radius:6px;font-family:monospace}
+.table-empty{text-align:center;padding:48px;color:#aaa;font-size:14px}
+.empty-icon{font-size:40px;display:block;margin-bottom:8px}
+.action-btns{display:flex;gap:6px}
+.status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.status-Pending{background:#FFF2CC;color:#7d5700}
+.status-Approved{background:#E2EFDA;color:#375623}
+.status-Rejected{background:#FFDADA;color:#7b0000}
+.status-Returned{background:#FCE4D6;color:#7a3b00}
+.status-Inwarded{background:#E2EFDA;color:#375623}
+.status-Partial{background:#FCE4D6;color:#7a3b00}
+.status-On-Hold{background:#BDD7EE;color:#1c4a6e}
+.status-Acknowledged{background:#E2EFDA;color:#375623}
+.status-Credit-Issued{background:#E2EFDA;color:#375623}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:680px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-header{padding:20px 24px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-size:17px;font-weight:700;color:#1F3864}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;line-height:1}
+.modal-close:hover{color:#333}
+.modal-body{padding:20px 24px;overflow-y:auto;flex:1}
+.modal-footer{padding:16px 24px;border-top:1px solid #f0f0f0;display:flex;gap:10px;justify-content:flex-end}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:12px;font-weight:600;color:#555}
+.form-label.required::after{content:' *';color:#C00000}
+.form-input,.form-select{padding:9px 12px;border:1.5px solid #dde;border-radius:8px;font-size:13px;outline:none;transition:border .15s;background:#fff;width:100%}
+.form-input:focus,.form-select:focus{border-color:#2E75B6;box-shadow:0 0 0 3px rgba(46,117,182,.1)}
+.form-input.error{border-color:#C00000}
+.form-error{font-size:11px;color:#C00000}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center}
+.confirm-box{background:#fff;border-radius:12px;padding:28px;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.2);text-align:center}
+.confirm-icon{font-size:44px;margin-bottom:12px}
+.confirm-title{font-size:17px;font-weight:700;margin-bottom:8px}
+.confirm-msg{font-size:13px;color:#666;margin-bottom:20px;line-height:1.5}
+.confirm-btns{display:flex;gap:10px;justify-content:center}
+.toast{position:fixed;bottom:28px;right:28px;background:#1F3864;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;align-items:center;gap:8px;animation:slideUp .25s ease}
+.toast.success{background:#548235}
+.toast.error{background:#C00000}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.summary-strip{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.summary-chip{background:#fff;border-radius:8px;padding:10px 16px;box-shadow:0 1px 4px rgba(0,0,0,.07);font-size:12px}
+.summary-chip strong{font-size:18px;display:block;font-weight:800}
+
+/* Setup Screen */
+.setup-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1F3864 0%,#2E75B6 100%);padding:24px}
+.setup-card{background:#fff;border-radius:20px;width:100%;max-width:720px;box-shadow:0 24px 80px rgba(0,0,0,.25);overflow:hidden}
+.setup-header{background:linear-gradient(135deg,#1F3864,#2E75B6);padding:32px;text-align:center;color:#fff}
+.setup-header h1{font-size:24px;font-weight:800;margin-bottom:8px}
+.setup-header p{font-size:14px;opacity:.8}
+.setup-body{padding:32px}
+.setup-steps{display:flex;flex-direction:column;gap:20px;margin-bottom:28px}
+.setup-step{display:flex;gap:16px;align-items:flex-start}
+.step-num{width:32px;height:32px;border-radius:50%;background:#1F3864;color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-body h4{font-size:14px;font-weight:700;color:#1F3864;margin-bottom:4px}
+.step-body p{font-size:13px;color:#555;line-height:1.6}
+.step-body a{color:#2E75B6;text-decoration:none;font-weight:600}
+.step-body a:hover{text-decoration:underline}
+.code-block{background:#1e1e2e;color:#cdd6f4;border-radius:10px;padding:16px;font-size:12px;font-family:monospace;line-height:1.7;margin-top:10px;position:relative;overflow:hidden;max-height:180px;overflow-y:auto}
+.code-block .copy-btn{position:sticky;top:0;float:right;background:#2E75B6;color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600}
+.url-input-wrap{display:flex;gap:10px;align-items:center;margin-top:8px}
+.url-input{flex:1;padding:12px 16px;border:2px solid #dde;border-radius:10px;font-size:14px;outline:none;transition:border .15s}
+.url-input:focus{border-color:#2E75B6}
+.url-input.valid{border-color:#548235;background:#f0fff4}
+.url-input.invalid{border-color:#C00000}
+.test-result{font-size:12px;margin-top:6px;font-weight:600;display:flex;align-items:center;gap:6px}
+.test-result.ok{color:#548235}
+.test-result.fail{color:#C00000}
+
+/* Loading */
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:16px;color:#888}
+.spinner{width:40px;height:40px;border:4px solid #e0e0e0;border-top-color:#2E75B6;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-inline{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#888}
+.spinner-sm{width:16px;height:16px;border:2px solid #e0e0e0;border-top-color:#2E75B6;border-radius:50%;animation:spin .8s linear infinite}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ─── Module Definitions ───────────────────────────────────────────────────
+const MODULES = {
+  'approved-acc': {
+    title:'Approved Accessories', shortTitle:'Acc. Approved',
+    prefix:'ACC', icon:'🔧', color:'#1F3864', lightColor:'#DEEAF1',
+    statusOptions:['Pending','Approved','Rejected','Returned'],
+    fields:[
+      {key:'partName',      label:'Part Name',          type:'text',   required:true},
+      {key:'partCode',      label:'Part Code / SKU',    type:'text'},
+      {key:'vendorName',    label:'Vendor Name',        type:'text'},
+      {key:'invoiceNo',     label:'Invoice No.',        type:'text'},
+      {key:'vendorContact', label:'Vendor Contact',     type:'text'},
+      {key:'qtyApproved',   label:'Qty Approved',       type:'number'},
+      {key:'unitPrice',     label:'Unit Price (₹)',     type:'number'},
+      {key:'approvalDate',  label:'Approval Date',      type:'date'},
+      {key:'approvedBy',    label:'Approved By',        type:'text'},
+      {key:'status',        label:'Status',             type:'select', options:['Pending','Approved','Rejected','Returned']},
+    ],
+    tableColumns:['id','partName','partCode','vendorName','invoiceNo','qtyApproved','unitPrice','totalValue','approvalDate','approvedBy','status'],
+    tableLabels: ['ID','Part Name','Part Code','Vendor','Invoice','Qty','Unit Price','Total Value','Date','Approved By','Status'],
+  },
+  'inward-acc': {
+    title:'Inward Accessories', shortTitle:'Acc. Inward',
+    prefix:'INWA', icon:'📦', color:'#2E75B6', lightColor:'#BDD7EE',
+    statusOptions:['Pending','Inwarded','Partial','On Hold','Returned'],
+    fields:[
+      {key:'accRefNo',   label:'Acc. Ref. No. (e.g. ACC-001)', type:'text', required:true},
+      {key:'partName',   label:'Part Name',          type:'text', required:true},
+      {key:'partCode',   label:'Part Code / SKU',    type:'text'},
+      {key:'vendorName', label:'Vendor Name',        type:'text'},
+      {key:'invoiceNo',  label:'Invoice No.',        type:'text'},
+      {key:'qtyInwarded',label:'Qty Inwarded',       type:'number'},
+      {key:'unitPrice',  label:'Unit Price (₹)',     type:'number'},
+      {key:'inwardDate', label:'Inward Date',        type:'date'},
+      {key:'receivedBy', label:'Received By',        type:'text'},
+      {key:'status',     label:'Status',             type:'select', options:['Pending','Inwarded','Partial','On Hold','Returned']},
+    ],
+    tableColumns:['id','accRefNo','partName','vendorName','invoiceNo','qtyInwarded','unitPrice','totalValue','inwardDate','receivedBy','status'],
+    tableLabels: ['ID','Acc. Ref.','Part Name','Vendor','Invoice','Qty','Unit Price','Total Value','Inward Date','Received By','Status'],
+  },
+  'approved-ce': {
+    title:'Approved CE', shortTitle:'CE Approved',
+    prefix:'CE', icon:'📺', color:'#375623', lightColor:'#E2EFDA',
+    statusOptions:['Pending','Approved','Rejected','Returned'],
+    fields:[
+      {key:'deviceName',    label:'CE / Device Name',  type:'text', required:true},
+      {key:'modelSerial',   label:'Model / Serial No.',type:'text'},
+      {key:'vendorName',    label:'Vendor Name',       type:'text'},
+      {key:'invoiceNo',     label:'Invoice No.',       type:'text'},
+      {key:'vendorContact', label:'Vendor Contact',    type:'text'},
+      {key:'qtyApproved',   label:'Qty Approved',      type:'number'},
+      {key:'unitPrice',     label:'Unit Price (₹)',    type:'number'},
+      {key:'approvalDate',  label:'Approval Date',     type:'date'},
+      {key:'approvedBy',    label:'Approved By',       type:'text'},
+      {key:'status',        label:'Status',            type:'select', options:['Pending','Approved','Rejected','Returned']},
+    ],
+    tableColumns:['id','deviceName','modelSerial','vendorName','invoiceNo','qtyApproved','unitPrice','totalValue','approvalDate','approvedBy','status'],
+    tableLabels: ['ID','Device Name','Model/Serial','Vendor','Invoice','Qty','Unit Price','Total Value','Date','Approved By','Status'],
+  },
+  'inward-ce': {
+    title:'Inward CE', shortTitle:'CE Inward',
+    prefix:'INWCE', icon:'📥', color:'#00695C', lightColor:'#B2DFDB',
+    statusOptions:['Pending','Inwarded','Partial','On Hold','Returned'],
+    fields:[
+      {key:'ceRefNo',    label:'CE Ref. No. (e.g. CE-001)', type:'text', required:true},
+      {key:'deviceName', label:'CE / Device Name',  type:'text', required:true},
+      {key:'modelSerial',label:'Model / Serial No.',type:'text'},
+      {key:'vendorName', label:'Vendor Name',       type:'text'},
+      {key:'invoiceNo',  label:'Invoice No.',       type:'text'},
+      {key:'qtyInwarded',label:'Qty Inwarded',      type:'number'},
+      {key:'unitPrice',  label:'Unit Price (₹)',    type:'number'},
+      {key:'inwardDate', label:'Inward Date',       type:'date'},
+      {key:'receivedBy', label:'Received By',       type:'text'},
+      {key:'status',     label:'Status',            type:'select', options:['Pending','Inwarded','Partial','On Hold','Returned']},
+    ],
+    tableColumns:['id','ceRefNo','deviceName','vendorName','invoiceNo','qtyInwarded','unitPrice','totalValue','inwardDate','receivedBy','status'],
+    tableLabels: ['ID','CE Ref.','Device Name','Vendor','Invoice','Qty','Unit Price','Total Value','Inward Date','Received By','Status'],
+  },
+  'return-vendor': {
+    title:'Return to Vendor', shortTitle:'Return',
+    prefix:'RTV', icon:'↩️', color:'#C65911', lightColor:'#FCE4D6',
+    statusOptions:['Pending','Returned','Acknowledged','Credit Issued','Rejected'],
+    fields:[
+      {key:'type',          label:'Type',              type:'select', required:true, options:['Accessory','Consumer Electronics']},
+      {key:'originalRef',   label:'Original Ref. No.', type:'text', required:true},
+      {key:'itemName',      label:'Item Name',         type:'text', required:true},
+      {key:'partCodeModel', label:'Part Code / Model', type:'text'},
+      {key:'vendorName',    label:'Vendor Name',       type:'text'},
+      {key:'invoiceNo',     label:'Invoice No.',       type:'text'},
+      {key:'qtyReturned',   label:'Qty Returned',      type:'number'},
+      {key:'unitPrice',     label:'Unit Price (₹)',    type:'number'},
+      {key:'returnDate',    label:'Return Date',       type:'date'},
+      {key:'returnReason',  label:'Return Reason',     type:'select', options:['Defective','Wrong Item','Excess Qty','Damaged in Transit','Quality Issue','Other']},
+      {key:'status',        label:'Status',            type:'select', options:['Pending','Returned','Acknowledged','Credit Issued','Rejected']},
+    ],
+    tableColumns:['id','type','originalRef','itemName','vendorName','invoiceNo','qtyReturned','unitPrice','totalValue','returnDate','returnReason','status'],
+    tableLabels: ['ID','Type','Ref. No.','Item Name','Vendor','Invoice','Qty','Unit Price','Total Value','Return Date','Reason','Status'],
+  },
+};
+
+const MODULE_KEYS = ['approved-acc','inward-acc','approved-ce','inward-ce','return-vendor'];
+const QTY_KEY = {'approved-acc':'qtyApproved','inward-acc':'qtyInwarded','approved-ce':'qtyApproved','inward-ce':'qtyInwarded','return-vendor':'qtyReturned'};
+const URL_KEY = 'svc_script_url';
+
+// ─── Google Sheets API layer ──────────────────────────────────────────────
+const API = {
+  url: localStorage.getItem(URL_KEY) || '',
+
+  setUrl(u) { this.url = u; localStorage.setItem(URL_KEY, u); },
+  clearUrl() { this.url = ''; localStorage.removeItem(URL_KEY); },
+
+  async call(params) {
+    const qs = Object.entries(params).map(([k,v]) => `${k}=${v}`).join('&');
+    const res = await fetch(`${this.url}?${qs}`, { mode: 'cors' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  },
+
+  ping()                         { return this.call({ action:'ping' }); },
+  getAll(m)                      { return this.call({ action:'getAll', m }); },
+  add(m, rec)                    { return this.call({ action:'add',    m, d: encodeURIComponent(JSON.stringify(rec)) }); },
+  update(m, id, rec)             { return this.call({ action:'update', m, id, d: encodeURIComponent(JSON.stringify(rec)) }); },
+  del(m, id)                     { return this.call({ action:'del',    m, id }); },
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────
+const genId = (prefix, records) => {
+  const max = records.reduce((m, r) => {
+    const n = parseInt((r.id||'').split('-').pop()||'0');
+    return n > m ? n : m;
+  }, 0);
+  return `${prefix}-${String(max+1).padStart(3,'0')}`;
+};
+
+const fmtCurrency = v => (v != null && v !== '') ? `₹${Number(v).toLocaleString('en-IN',{minimumFractionDigits:2})}` : '—';
+const fmtNum = v => (v != null && v !== '') ? Number(v).toLocaleString('en-IN') : '—';
+const totalVal = (rec, mk) => (parseFloat(rec[QTY_KEY[mk]])||0) * (parseFloat(rec.unitPrice)||0);
+
+const getCellValue = (col, rec, mk) => {
+  if (col==='totalValue') return fmtCurrency(totalVal(rec,mk));
+  if (col==='unitPrice') return fmtCurrency(rec[col]);
+  if (['qtyApproved','qtyInwarded','qtyReturned'].includes(col)) return fmtNum(rec[col]);
+  return rec[col]||'—';
+};
+
+// ─── Small components ─────────────────────────────────────────────────────
+const StatusBadge = ({status}) => (
+  <span className={`status-badge status-${(status||'').replace(/\s+/g,'-')}`}>{status||'—'}</span>
+);
+
+const Toast = ({msg,type,onDone}) => {
+  useEffect(() => { const t = setTimeout(onDone, 3000); return ()=>clearTimeout(t); }, []);
+  const icons = {success:'✅',error:'❌',info:'ℹ️'};
+  return <div className={`toast ${type}`}>{icons[type]||'✅'} {msg}</div>;
+};
+
+const Spinner = ({size='lg'}) => (
+  <div className={size==='sm' ? 'loading-inline' : 'loading-screen'}>
+    <div className={size==='sm' ? 'spinner-sm' : 'spinner'}></div>
+    {size!=='sm' && <span>Loading from Google Sheets…</span>}
+  </div>
+);
+
+// ─── Apps Script code string (for setup screen) ───────────────────────────
+const APPS_SCRIPT_CODE = `function doGet(e){
+  try{
+    const p=e.parameter,ss=SpreadsheetApp.getActiveSpreadsheet();
+    let r;
+    switch(p.action){
+      case 'ping':   r={ok:true,time:new Date().toISOString()};break;
+      case 'getAll': r={records:getAll(ss,p.m)};break;
+      case 'add':    r=add(ss,p.m,JSON.parse(decodeURIComponent(p.d)));break;
+      case 'update': r=update(ss,p.m,p.id,JSON.parse(decodeURIComponent(p.d)));break;
+      case 'del':    r=del(ss,p.m,p.id);break;
+      default:       r={error:'Unknown action'};
+    }
+    return out(r);
+  }catch(e){return out({error:e.toString()});}
+}
+function out(d){
+  return ContentService.createTextOutput(JSON.stringify(d))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+function getSheet(ss,m){
+  let s=ss.getSheetByName(m);
+  if(!s){s=ss.insertSheet(m);s.appendRow(['id','data','createdAt']);}
+  return s;
+}
+function getAll(ss,m){
+  const s=getSheet(ss,m),rows=s.getDataRange().getValues();
+  if(rows.length<=1)return[];
+  return rows.slice(1).filter(r=>r[0]!='')
+    .map(r=>{try{return JSON.parse(r[1]);}catch(_){return null;}}).filter(Boolean);
+}
+function add(ss,m,rec){
+  const s=getSheet(ss,m);
+  rec.createdAt=new Date().toISOString();
+  s.appendRow([rec.id,JSON.stringify(rec),rec.createdAt]);
+  return{ok:true,id:rec.id};
+}
+function update(ss,m,id,rec){
+  const s=getSheet(ss,m),rows=s.getDataRange().getValues();
+  for(let i=1;i<rows.length;i++){
+    if(rows[i][0]===id){rec.updatedAt=new Date().toISOString();
+      s.getRange(i+1,2).setValue(JSON.stringify(rec));return{ok:true};}
+  }
+  return{error:'Not found'};
+}
+function del(ss,m,id){
+  const s=getSheet(ss,m),rows=s.getDataRange().getValues();
+  for(let i=1;i<rows.length;i++){
+    if(rows[i][0]===id){s.deleteRow(i+1);return{ok:true};}
+  }
+  return{error:'Not found'};
+}`;
+
+// ─── Setup Screen ─────────────────────────────────────────────────────────
+const SetupScreen = ({ onSetup }) => {
+  const [url, setUrl]       = useState('');
+  const [testing, setTest]  = useState(false);
+  const [result, setResult] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(() => {
+      setCopied(true); setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const testConnection = async () => {
+    if (!url.trim()) return;
+    setTest(true); setResult(null);
+    try {
+      API.setUrl(url.trim());
+      const r = await API.ping();
+      if (r.ok) setResult({ ok: true, msg: `Connected! Server time: ${new Date(r.time).toLocaleTimeString()}` });
+      else setResult({ ok: false, msg: r.error || 'Unexpected response' });
+    } catch(e) {
+      setResult({ ok: false, msg: 'Cannot reach the URL. Check it is deployed correctly.' });
+    }
+    setTest(false);
+  };
+
+  const handleSave = () => {
+    if (result?.ok) { API.setUrl(url.trim()); onSetup(); }
+  };
+
+  return (
+    <div className="setup-screen">
+      <div className="setup-card">
+        <div className="setup-header">
+          <div style={{fontSize:40,marginBottom:12}}>☁️</div>
+          <h1>Connect to Google Sheets</h1>
+          <p>Follow the steps below to set up your free cloud database — takes about 5 minutes</p>
+        </div>
+        <div className="setup-body">
+          <div className="setup-steps">
+
+            <div className="setup-step">
+              <div className="step-num">1</div>
+              <div className="step-body">
+                <h4>Create a new Google Sheet</h4>
+                <p>Go to <a href="https://sheets.new" target="_blank">sheets.new</a> to create a blank spreadsheet. Give it any name (e.g. "Service Department Data").</p>
+              </div>
+            </div>
+
+            <div className="setup-step">
+              <div className="step-num">2</div>
+              <div className="step-body">
+                <h4>Open Apps Script</h4>
+                <p>In your Google Sheet, click <strong>Extensions → Apps Script</strong>. Delete any existing code in the editor.</p>
+              </div>
+            </div>
+
+            <div className="setup-step">
+              <div className="step-num">3</div>
+              <div className="step-body">
+                <h4>Paste this code into the editor</h4>
+                <div className="code-block">
+                  <button className="copy-btn" onClick={copyCode}>{copied ? '✅ Copied!' : '📋 Copy'}</button>
+                  <pre style={{whiteSpace:'pre-wrap',wordBreak:'break-all'}}>{APPS_SCRIPT_CODE}</pre>
+                </div>
+              </div>
+            </div>
+
+            <div className="setup-step">
+              <div className="step-num">4</div>
+              <div className="step-body">
+                <h4>Deploy as Web App</h4>
+                <p>Click <strong>Deploy → New deployment</strong>. Set:<br/>
+                  • Type: <strong>Web app</strong><br/>
+                  • Execute as: <strong>Me</strong><br/>
+                  • Who has access: <strong>Anyone</strong><br/>
+                  Then click <strong>Deploy</strong> and copy the Web App URL.</p>
+              </div>
+            </div>
+
+            <div className="setup-step">
+              <div className="step-num">5</div>
+              <div className="step-body">
+                <h4>Paste the Web App URL below</h4>
+                <div className="url-input-wrap">
+                  <input className={`url-input ${result ? (result.ok?'valid':'invalid') : ''}`}
+                    type="url" placeholder="https://script.google.com/macros/s/.../exec"
+                    value={url} onChange={e => { setUrl(e.target.value); setResult(null); }} />
+                  <button className="btn btn-outline" onClick={testConnection} disabled={testing || !url.trim()}>
+                    {testing ? <><div className="spinner-sm"></div> Testing…</> : '🔗 Test'}
+                  </button>
+                </div>
+                {result && (
+                  <div className={`test-result ${result.ok?'ok':'fail'}`}>
+                    {result.ok ? '✅' : '❌'} {result.msg}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <button className="btn btn-primary" style={{width:'100%',justifyContent:'center',padding:'14px'}}
+            onClick={handleSave} disabled={!result?.ok}>
+            {result?.ok ? '🚀 Launch App' : 'Test connection first to continue'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Modal ────────────────────────────────────────────────────────────────
+const Modal = ({ title, onClose, children, footer }) => (
+  <div className="modal-overlay" onClick={e => e.target===e.currentTarget && onClose()}>
+    <div className="modal">
+      <div className="modal-header">
+        <h3>{title}</h3>
+        <button className="modal-close" onClick={onClose}>×</button>
+      </div>
+      <div className="modal-body">{children}</div>
+      {footer && <div className="modal-footer">{footer}</div>}
+    </div>
+  </div>
+);
+
+// ─── Add/Edit Form ────────────────────────────────────────────────────────
+const AddEditForm = ({ moduleKey, record, onSave, onClose, saving }) => {
+  const mod = MODULES[moduleKey];
+  const [form, setForm] = useState(() => {
+    const init = {};
+    mod.fields.forEach(f => { init[f.key] = record ? (record[f.key]??'') : ''; });
+    return init;
+  });
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const e = {};
+    mod.fields.filter(f => f.required).forEach(f => {
+      if (!form[f.key] || String(form[f.key]).trim()==='') e[f.key]='Required';
+    });
+    setErrors(e);
+    return Object.keys(e).length===0;
+  };
+
+  const tv = totalVal(form, moduleKey);
+
+  return (
+    <Modal title={record ? `Edit — ${record.id}` : `Add New ${mod.title}`} onClose={onClose}
+      footer={<>
+        <button className="btn btn-outline" onClick={onClose} disabled={saving}>Cancel</button>
+        <button className="btn btn-primary" onClick={() => validate() && onSave(form)} disabled={saving}>
+          {saving ? <><div className="spinner-sm"></div> Saving…</> : (record ? 'Save Changes' : 'Add Record')}
+        </button>
+      </>}>
+      <div className="form-grid">
+        {mod.fields.map(f => (
+          <div key={f.key} className={`form-group ${['vendorContact','returnReason'].includes(f.key)?'full':''}`}>
+            <label className={`form-label${f.required?' required':''}`}>{f.label}</label>
+            {f.type==='select'
+              ? <select className="form-select" value={form[f.key]} onChange={e => setForm(p=>({...p,[f.key]:e.target.value}))}>
+                  <option value="">— Select —</option>
+                  {f.options.map(o => <option key={o}>{o}</option>)}
+                </select>
+              : <input className={`form-input${errors[f.key]?' error':''}`} type={f.type}
+                  value={form[f.key]} onChange={e => setForm(p=>({...p,[f.key]:e.target.value}))} />
+            }
+            {errors[f.key] && <span className="form-error">{errors[f.key]}</span>}
+          </div>
+        ))}
+        {tv > 0 && (
+          <div className="form-group full">
+            <label className="form-label">Total Value (auto-calculated)</label>
+            <div style={{padding:'9px 12px',background:'#f0fff4',borderRadius:8,fontWeight:700,color:'#375623',fontSize:14}}>
+              {fmtCurrency(tv)}
+            </div>
+          </div>
+        )}
+      </div>
+    </Modal>
+  );
+};
+
+// ─── Module Page ──────────────────────────────────────────────────────────
+const ModulePage = ({ moduleKey, records, onAdd, onEdit, onDelete, loading, showToast }) => {
+  const mod = MODULES[moduleKey];
+  const [search, setSearch]   = useState('');
+  const [statusF, setStatusF] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [editRec, setEditRec]   = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+  const [saving, setSaving]     = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const filtered = records.filter(r => {
+    const q = search.toLowerCase();
+    return (!q || Object.values(r).some(v => String(v).toLowerCase().includes(q)))
+      && (!statusF || r.status===statusF);
+  });
+
+  const handleSave = async (form) => {
+    setSaving(true);
+    try {
+      if (editRec) { await onEdit(moduleKey, {...editRec,...form}); showToast('Record updated','success'); }
+      else          { await onAdd(moduleKey, form);                  showToast('Record added','success'); }
+      setShowForm(false); setEditRec(null);
+    } catch(e) { showToast('Save failed: '+e.message,'error'); }
+    setSaving(false);
+  };
+
+  const doDelete = async () => {
+    setDeleting(true);
+    try {
+      await onDelete(moduleKey, deleteId);
+      showToast('Record deleted','info');
+    } catch(e) { showToast('Delete failed','error'); }
+    setDeleting(false);
+    setDeleteId(null);
+  };
+
+  const exportExcel = () => {
+    const rows = filtered.map(r => {
+      const row = {};
+      mod.tableColumns.forEach((col,i) => {
+        row[mod.tableLabels[i]] = col==='totalValue' ? totalVal(r,moduleKey) : (r[col]||'');
+      });
+      return row;
+    });
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb2 = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb2, ws, mod.title.slice(0,31));
+    XLSX.writeFile(wb2, `${mod.title.replace(/\s+/g,'_')}.xlsx`);
+    showToast('Exported to Excel','success');
+  };
+
+  const counts = {};
+  mod.statusOptions.forEach(s => { counts[s] = records.filter(r=>r.status===s).length; });
+  const totalQty = records.reduce((s,r) => s+(parseFloat(r[QTY_KEY[moduleKey]])||0), 0);
+  const tVal     = records.reduce((s,r) => s+totalVal(r,moduleKey), 0);
+
+  return (
+    <div>
+      {showForm && <AddEditForm moduleKey={moduleKey} record={editRec} onSave={handleSave} onClose={() => {setShowForm(false);setEditRec(null);}} saving={saving} />}
+      {deleteId && (
+        <div className="confirm-overlay">
+          <div className="confirm-box">
+            <div className="confirm-icon">🗑️</div>
+            <div className="confirm-title">Delete Record?</div>
+            <div className="confirm-msg">This will permanently remove <strong>{deleteId}</strong> from Google Sheets.</div>
+            <div className="confirm-btns">
+              <button className="btn btn-outline" onClick={() => setDeleteId(null)} disabled={deleting}>Cancel</button>
+              <button className="btn btn-danger" onClick={doDelete} disabled={deleting}>
+                {deleting ? <><div className="spinner-sm"></div> Deleting…</> : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="module-header">
+        <div className="module-title">
+          <span style={{fontSize:24}}>{mod.icon}</span>
+          <h2>{mod.title}</h2>
+          <span className="module-badge" style={{background:mod.color}}>{records.length} records</span>
+          {loading && <div className="loading-inline"><div className="spinner-sm"></div> syncing…</div>}
+        </div>
+        <div className="module-actions">
+          <button className="btn btn-success" onClick={exportExcel}>⬇ Export Excel</button>
+          <button className="btn btn-primary" onClick={() => {setEditRec(null);setShowForm(true);}}>＋ Add Record</button>
+        </div>
+      </div>
+
+      <div className="filters-bar">
+        <div className="filter-group">
+          <label>🔍</label>
+          <input className="filter-input" placeholder="Search records…" value={search} onChange={e=>setSearch(e.target.value)} />
+        </div>
+        <div className="filter-group">
+          <label>Status</label>
+          <select className="filter-select" value={statusF} onChange={e=>setStatusF(e.target.value)}>
+            <option value="">All</option>
+            {mod.statusOptions.map(s=><option key={s}>{s}</option>)}
+          </select>
+        </div>
+        {(search||statusF) && <button className="filter-clear" onClick={()=>{setSearch('');setStatusF('');}}>✕ Clear</button>}
+      </div>
+
+      <div className="table-wrap">
+        <div className="table-info">
+          <span>Showing <strong>{filtered.length}</strong> of <strong>{records.length}</strong> records</span>
+          <span style={{color:'#2E75B6',fontWeight:600}}>Total Value: {fmtCurrency(tVal)}</span>
+        </div>
+        <div className="table-scroll">
+          {loading && records.length===0
+            ? <Spinner />
+            : <table>
+                <thead><tr>
+                  {mod.tableLabels.map((lbl,i) => <th key={i}>{lbl}</th>)}
+                  <th>Actions</th>
+                </tr></thead>
+                <tbody>
+                  {filtered.length===0
+                    ? <tr><td colSpan={mod.tableLabels.length+1} className="table-empty">
+                        <span className="empty-icon">📋</span>No records yet. Click <strong>＋ Add Record</strong> to get started.
+                      </td></tr>
+                    : filtered.map(r => (
+                      <tr key={r.id}>
+                        {mod.tableColumns.map(col => (
+                          <td key={col}>
+                            {col==='id'     ? <span className="id-chip">{r.id}</span>
+                            :col==='status'  ? <StatusBadge status={r.status}/>
+                            : getCellValue(col,r,moduleKey)}
+                          </td>
+                        ))}
+                        <td><div className="action-btns">
+                          <button className="btn btn-outline btn-sm btn-icon" onClick={() => {setEditRec(r);setShowForm(true);}}>✏️</button>
+                          <button className="btn btn-danger btn-sm btn-icon" onClick={() => setDeleteId(r.id)}>🗑</button>
+                        </div></td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+          }
+        </div>
+      </div>
+
+      <div className="summary-strip">
+        <div className="summary-chip"><strong>{fmtNum(totalQty)}</strong>Total Qty</div>
+        <div className="summary-chip"><strong>{fmtCurrency(tVal)}</strong>Total Value</div>
+        {mod.statusOptions.map(s => (
+          <div key={s} className="summary-chip">
+            <strong style={{color:mod.color}}>{counts[s]||0}</strong>{s}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ─── Chart ────────────────────────────────────────────────────────────────
+const BarChart = ({ moduleKey, records, color }) => {
+  const ref = useRef(null);
+  const chart = useRef(null);
+  const mod = MODULES[moduleKey];
+  useEffect(() => {
+    if (!ref.current) return;
+    if (chart.current) chart.current.destroy();
+    chart.current = new Chart(ref.current, {
+      type:'bar',
+      data: { labels: mod.statusOptions, datasets:[{data: mod.statusOptions.map(s=>records.filter(r=>r.status===s).length), backgroundColor:color+'cc', borderRadius:6, borderSkipped:false}] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+        scales:{ x:{grid:{display:false},ticks:{font:{size:11}}}, y:{beginAtZero:true,ticks:{stepSize:1,font:{size:11}},grid:{color:'#f0f0f0'}} } }
+    });
+    return () => { if (chart.current) chart.current.destroy(); };
+  }, [records]);
+  return <canvas ref={ref}/>;
+};
+
+// ─── Dashboard ────────────────────────────────────────────────────────────
+const Dashboard = ({ data, loadingSet }) => {
+  const colors = {'approved-acc':'#1F3864','inward-acc':'#2E75B6','approved-ce':'#375623','inward-ce':'#00695C','return-vendor':'#C65911'};
+  const today = new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+
+  const stats = MODULE_KEYS.map(k => {
+    const recs = data[k]||[];
+    const pending   = recs.filter(r=>r.status==='Pending').length;
+    const completed = recs.filter(r=>['Approved','Inwarded','Credit Issued','Returned','Acknowledged'].includes(r.status)).length;
+    const tv = recs.reduce((s,r)=>s+totalVal(r,k),0);
+    return {key:k, mod:MODULES[k], recs, pending, completed, tv};
+  });
+
+  return (
+    <div>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20,flexWrap:'wrap',gap:10}}>
+        <div>
+          <h2 style={{fontSize:22,fontWeight:800,color:'#1F3864'}}>Management Dashboard</h2>
+          <p style={{color:'#888',fontSize:13}}>Live data from Google Sheets</p>
+        </div>
+        <span className="badge-date">📅 {today}</span>
+      </div>
+
+      <div className="kpi-grid">
+        {stats.map(({key,mod,recs,pending,completed,tv}) => (
+          <div key={key} className="kpi-card" data-icon={mod.icon} style={{borderTopColor:colors[key]}}>
+            <div className="kpi-label">{mod.shortTitle}</div>
+            <div className="kpi-value" style={{color:colors[key]}}>{loadingSet.has(key)?'…':recs.length}</div>
+            <div className="kpi-sub">Total records</div>
+            <div className="kpi-row">
+              <span className="kpi-chip status-Pending">{pending} pending</span>
+              <span className="kpi-chip status-Approved">{completed} done</span>
+            </div>
+            {tv > 0 && <div style={{marginTop:6,fontSize:11,fontWeight:700,color:colors[key]}}>₹{Math.round(tv).toLocaleString('en-IN')}</div>}
+          </div>
+        ))}
+      </div>
+
+      <div className="pipeline-card">
+        <div className="pipeline-title">⚡ Workflow Pipeline</div>
+        <div className="pipeline-steps">
+          {stats.map(({key,mod,recs},i) => (
+            <React.Fragment key={key}>
+              <div className="pipe-step" style={{background:colors[key]}}>
+                <span className="pipe-count">{recs.length}</span>
+                {mod.shortTitle}
+              </div>
+              {i < stats.length-1 && <div className="pipe-arrow">→</div>}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+      <div className="charts-grid">
+        {stats.map(({key,recs}) => (
+          <div key={key} className="chart-card">
+            <div className="chart-title">
+              <span className="dot" style={{background:colors[key]}}></span>
+              {MODULES[key].title} — Status Breakdown
+            </div>
+            <div className="chart-wrap"><BarChart moduleKey={key} records={recs} color={colors[key]}/></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ─── App ─────────────────────────────────────────────────────────────────
+const App = () => {
+  const [setupDone, setSetupDone] = useState(!!API.url);
+  const [data, setData]           = useState({});
+  const [loadingSet, setLoadingSet] = useState(new Set(MODULE_KEYS));
+  const [page, setPage]           = useState('dashboard');
+  const [collapsed, setCollapsed] = useState(false);
+  const [toast, setToast]         = useState(null);
+  const [online, setOnline]       = useState(true);
+
+  const showToast = (msg, type='success') => setToast({msg,type,id:Date.now()});
+
+  // Load a single module from Sheets
+  const loadModule = useCallback(async (mk) => {
+    try {
+      const res = await API.getAll(mk);
+      setData(d => ({...d, [mk]: res.records||[]}));
+      setOnline(true);
+    } catch(e) {
+      setOnline(false);
+    } finally {
+      setLoadingSet(s => { const n=new Set(s); n.delete(mk); return n; });
+    }
+  }, []);
+
+  // Load all modules on mount
+  useEffect(() => {
+    if (!setupDone) return;
+    MODULE_KEYS.forEach(mk => loadModule(mk));
+  }, [setupDone]);
+
+  // Refresh current module when switching pages
+  useEffect(() => {
+    if (!setupDone || page==='dashboard') return;
+    loadModule(page);
+  }, [page]);
+
+  const handleAdd = async (mk, form) => {
+    const id = genId(MODULES[mk].prefix, data[mk]||[]);
+    const rec = {...form, id};
+    await API.add(mk, rec);
+    setData(d => ({...d, [mk]: [...(d[mk]||[]), rec]}));
+  };
+
+  const handleEdit = async (mk, updated) => {
+    await API.update(mk, updated.id, updated);
+    setData(d => ({...d, [mk]: (d[mk]||[]).map(r => r.id===updated.id ? updated : r)}));
+  };
+
+  const handleDelete = async (mk, id) => {
+    await API.del(mk, id);
+    setData(d => ({...d, [mk]: (d[mk]||[]).filter(r => r.id!==id)}));
+  };
+
+  const handleSetupDone = () => { setSetupDone(true); };
+  const handleDisconnect = () => { API.clearUrl(); setSetupDone(false); setData({}); };
+
+  if (!setupDone) return <SetupScreen onSetup={handleSetupDone} />;
+
+  const navItems = [
+    {key:'dashboard',     label:'Dashboard',            icon:'📊', section:'Overview'},
+    {key:'approved-acc',  label:'Approved Accessories', icon:'🔧', section:'Accessories', badge:(data['approved-acc']||[]).length},
+    {key:'inward-acc',    label:'Inward Accessories',   icon:'📦', badge:(data['inward-acc']||[]).length},
+    {key:'approved-ce',   label:'Approved CE',          icon:'📺', section:'Consumer Electronics', badge:(data['approved-ce']||[]).length},
+    {key:'inward-ce',     label:'Inward CE',            icon:'📥', badge:(data['inward-ce']||[]).length},
+    {key:'return-vendor', label:'Return to Vendor',     icon:'↩️', section:'Returns', badge:(data['return-vendor']||[]).length},
+    {key:'__disconnect',  label:'Change Connection',    icon:'⚙️', section:'Settings'},
+  ];
+
+  const pageTitle = page==='dashboard'
+    ? {title:'Dashboard', sub:'Live data from Google Sheets'}
+    : {title:MODULES[page]?.title||page, sub:'Manage records for this stage'};
+
+  return (
+    <div className="layout">
+      <div className={`sidebar${collapsed?' collapsed':''}`}>
+        <div className="sidebar-logo">
+          <div className="logo-icon">🏭</div>
+          {!collapsed && <div className="logo-text">Service Dept.<span>Cloud Edition ☁️</span></div>}
+          <button className="sidebar-toggle" onClick={() => setCollapsed(c=>!c)}>{collapsed?'▶':'◀'}</button>
+        </div>
+        <nav>
+          {navItems.map((item,i) => {
+            const prev = navItems[i-1];
+            const showSec = item.section && (!prev||prev.section!==item.section);
+            return (
+              <React.Fragment key={item.key}>
+                {showSec && !collapsed && <div className="nav-section">{item.section}</div>}
+                <div className={`nav-item${page===item.key?' active':''}`}
+                  onClick={() => item.key==='__disconnect' ? (window.confirm('Disconnect from Google Sheets?') && handleDisconnect()) : setPage(item.key)}>
+                  <span className="nav-icon">{item.icon}</span>
+                  <span className="nav-label">{item.label}</span>
+                  {item.badge > 0 && <span className="nav-badge">{item.badge}</span>}
+                </div>
+              </React.Fragment>
+            );
+          })}
+        </nav>
+        {!collapsed && <div className="sidebar-footer">Powered by Google Sheets ☁️</div>}
+      </div>
+
+      <div className={`main${collapsed?' shifted':''}`}>
+        <div className="topbar">
+          <div className="topbar-title">
+            <h1>{pageTitle.title}</h1>
+            <p>{pageTitle.sub}</p>
+          </div>
+          <div className="topbar-actions">
+            <span className={`cloud-badge${online?'':' offline'}`}>
+              {online ? '☁️ Google Sheets Connected' : '⚠️ Offline'}
+            </span>
+            {page!=='dashboard' && (
+              <button className="btn btn-outline btn-sm" onClick={()=>loadModule(page)} title="Refresh from Sheets">🔄 Refresh</button>
+            )}
+            <span className="badge-date">{new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</span>
+          </div>
+        </div>
+
+        <div className="page">
+          {page==='dashboard'
+            ? <Dashboard data={data} loadingSet={loadingSet} />
+            : <ModulePage
+                moduleKey={page}
+                records={data[page]||[]}
+                loading={loadingSet.has(page)}
+                onAdd={handleAdd}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                showToast={showToast}
+              />
+          }
+        </div>
+      </div>
+
+      {toast && <Toast key={toast.id} msg={toast.msg} type={toast.type} onDone={()=>setToast(null)}/>}
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
