@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Service Department Management System</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
@@ -131,32 +130,12 @@ td{padding:10px 14px;vertical-align:middle}
 .summary-strip{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
 .summary-chip{background:#fff;border-radius:8px;padding:10px 16px;box-shadow:0 1px 4px rgba(0,0,0,.07);font-size:12px}
 .summary-chip strong{font-size:18px;display:block;font-weight:800}
-.setup-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e 0%,#FF6B35 100%);padding:24px}
-.setup-card{background:#fff;border-radius:20px;width:100%;max-width:740px;box-shadow:0 24px 80px rgba(0,0,0,.3);overflow:hidden}
-.setup-header{background:linear-gradient(135deg,#FF6B35,#f7931e);padding:32px;text-align:center;color:#fff}
-.setup-header h1{font-size:24px;font-weight:800;margin-bottom:6px}
-.setup-header p{font-size:14px;opacity:.9}
-.setup-body{padding:28px 32px}
-.setup-steps{display:flex;flex-direction:column;gap:18px;margin-bottom:24px}
-.setup-step{display:flex;gap:14px;align-items:flex-start}
-.step-num{width:30px;height:30px;border-radius:50%;background:#FF6B35;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
-.step-body h4{font-size:14px;font-weight:700;color:#1F3864;margin-bottom:3px}
-.step-body p{font-size:13px;color:#555;line-height:1.6}
-.step-body a{color:#FF6B35;text-decoration:none;font-weight:600}
-.step-body b{color:#1F3864}
-.config-area{width:100%;padding:10px 14px;border:1.5px solid #dde;border-radius:8px;font-size:12px;font-family:monospace;height:130px;resize:none;outline:none;background:#fafafa;margin-top:8px}
-.config-area:focus{border-color:#FF6B35;box-shadow:0 0 0 3px rgba(255,107,53,.1)}
-.config-area.valid{border-color:#548235;background:#f0fff4}
-.config-area.invalid{border-color:#C00000}
-.test-row{display:flex;gap:10px;align-items:center;margin-top:10px}
-.test-result{font-size:12px;font-weight:600}
-.test-result.ok{color:#548235}.test-result.fail{color:#C00000}
 .spinner{width:40px;height:40px;border:4px solid #e0e0e0;border-top-color:#FF6B35;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner-sm{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
 .spinner-sm.dark{border:2px solid #eee;border-top-color:#FF6B35}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
-@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}.form-grid{grid-column:1fr}}
 </style>
 </head>
 <body>
@@ -165,24 +144,24 @@ td{padding:10px 14px;vertical-align:middle}
 const { useState, useEffect, useRef, useCallback } = React;
 
 const MODULES = {
-  'approved-acc':{title:'Approved Accessories',shortTitle:'Acc. Approved',prefix:'ACC',icon:'ð§',color:'#1F3864',statusOptions:['Pending','Approved','Rejected','Returned'],
-    fields:[{key:'partName',label:'Part Name',type:'text',required:true},{key:'partCode',label:'Part Code / SKU',type:'text'},{key:'vendorName',label:'Vendor Name',type:'text'},{key:'invoiceNo',label:'Invoice No.',type:'text'},{key:'vendorContact',label:'Vendor Contact',type:'text'},{key:'qtyApproved',label:'Qty Approved',type:'number'},{key:'unitPrice',label:'Unit Price (â¹)',type:'number'},{key:'approvalDate',label:'Approval Date',type:'date'},{key:'approvedBy',label:'Approved By',type:'text'},{key:'status',label:'Status',type:'select',options:['Pending','Approved','Rejected','Returned']}],
+  'approved-acc':{title:'Approved Accessories',shortTitle:'Acc. Approved',prefix:'ACC',icon:'\uD83D\uDD27',color:'#1F3864',statusOptions:['Pending','Approved','Rejected','Returned'],
+    fields:[{key:'partName',label:'Part Name',type:'text',required:true},{key:'partCode',label:'Part Code / SKU',type:'text'},{key:'vendorName',label:'Vendor Name',type:'text'},{key:'invoiceNo',label:'Invoice No.',type:'text'},{key:'vendorContact',label:'Vendor Contact',type:'text'},{key:'qtyApproved',label:'Qty Approved',type:'number'},{key:'unitPrice',label:'Unit Price (\u20B9)',type:'number'},{key:'approvalDate',label:'Approval Date',type:'date'},{key:'approvedBy',label:'Approved By',type:'text'},{key:'status',label:'Status',type:'select',options:['Pending','Approved','Rejected','Returned']}],
     tableColumns:['id','partName','partCode','vendorName','invoiceNo','qtyApproved','unitPrice','totalValue','approvalDate','approvedBy','status'],
     tableLabels:['ID','Part Name','Part Code','Vendor','Invoice','Qty','Unit Price','Total Value','Date','Approved By','Status']},
-  'inward-acc':{title:'Inward Accessories',shortTitle:'Acc. Inward',prefix:'INWA',icon:'ð¦',color:'#2E75B6',statusOptions:['Pending','Inwarded','Partial','On Hold','Returned'],
-    fields:[{key:'accRefNo',label:'Acc. Ref. No.',type:'text',required:true},{key:'partName',label:'Part Name',type:'text',required:true},{key:'partCode',label:'Part Code / SKU',type:'text'},{key:'vendorName',label:'Vendor Name',type:'text'},{key:'invoiceNo',label:'Invoice No.',type:'text'},{key:'qtyInwarded',label:'Qty Inwarded',type:'number'},{key:'unitPrice',label:'Unit Price (â¹)',type:'number'},{key:'inwardDate',label:'Inward Date',type:'date'},{key:'receivedBy',label:'Received By',type:'text'},{key:'status',label:'Status',type:'select',options:['Pending','Inwarded','Partial','On Hold','Returned']}],
+  'inward-acc':{title:'Inward Accessories',shortTitle:'Acc. Inward',prefix:'INWA',icon:'\uD83D\uDCE6',color:'#2E75B6',statusOptions:['Pending','Inwarded','Partial','On Hold','Returned'],
+    fields:[{key:'accRefNo',label:'Acc. Ref. No.',type:'text',required:true},{key:'partName',label:'Part Name',type:'text',required:true},{key:'partCode',label:'Part Code / SKU',type:'text'},{key:'vendorName',label:'Vendor Name',type:'text'},{key:'invoiceNo',label:'Invoice No.',type:'text'},{key:'qtyInwarded',label:'Qty Inwarded',type:'number'},{key:'unitPrice',label:'Unit Price (\u20B9)',type:'number'},{key:'inwardDate',label:'Inward Date',type:'date'},{key:'receivedBy',label:'Received By',type:'text'},{key:'status',label:'Status',type:'select',options:['Pending','Inwarded','Partial','On Hold','Returned']}],
     tableColumns:['id','accRefNo','partName','vendorName','invoiceNo','qtyInwarded','unitPrice','totalValue','inwardDate','receivedBy','status'],
     tableLabels:['ID','Acc. Ref.','Part Name','Vendor','Invoice','Qty','Unit Price','Total Value','Inward Date','Received By','Status']},
-  'approved-ce':{title:'Approved CE',shortTitle:'CE Approved',prefix:'CE',icon:'ðº',color:'#375623',statusOptions:['Pending','Approved','Rejected','Returned'],
-    fields:[{key:'deviceName',label:'CE / Device Name',type:'text',required:true},{key:'modelSerial',label:'Model / Serial No.',type:'text'},{key:'vendorName',label:'Vendor Name',type:'text'},{key:'invoiceNo',label:'Invoice No.',type:'text'},{key:'vendorContact',label:'Vendor Contact',type:'text'},{key:'qtyApproved',label:'Qty Approved',type:'number'},{key:'unitPrice',label:'Unit Price (â¹)',type:'number'},{key:'approvalDate',label:'Approval Date',type:'date'},{key:'approvedBy',label:'Approved By',type:'text'},{key:'status',label:'Status',type:'select',options:['Pending','Approved','Rejected','Returned']}],
+  'approved-ce':{title:'Approved CE',shortTitle:'CE Approved',prefix:'CE',icon:'\uD83D\uDCFA',color:'#375623',statusOptions:['Pending','Approved','Rejected','Returned'],
+    fields:[{key:'deviceName',label:'CE / Device Name',type:'text',required:true},{key:'modelSerial',label:'Model / Serial No.',type:'text'},{key:'vendorName',label:'Vendor Name',type:'text'},{key:'invoiceNo',label:'Invoice No.',type:'text'},{key:'vendorContact',label:'Vendor Contact',type:'text'},{key:+qtyApproved',label:'Qty Approved',type:'number'},{key:'unitPrice',label:'Unit Price (\u20B9)',type:'number'},{key:'approvalDate',label:'Approval Date',type:'date'},{key:'approvedBy',label:'Approved By',type:'text'},{key:'status',label:'Status',type:'select',options:['Pending','Approved','Rejected','Returned']}],
     tableColumns:['id','deviceName','modelSerial','vendorName','invoiceNo','qtyApproved','unitPrice','totalValue','approvalDate','approvedBy','status'],
     tableLabels:['ID','Device Name','Model/Serial','Vendor','Invoice','Qty','Unit Price','Total Value','Date','Approved By','Status']},
-  'inward-ce':{title:'Inward CE',shortTitle:'CE Inward',prefix:'INWCE',icon:'ð¥',color:'#00695C',statusOptions:['Pending','Inwarded','Partial','On Hold','Returned'],
-    fields:[{key:'ceRefNo',label:'CE Ref. No.',type:'text',required:true},{key:'deviceName',label:'CE / Device Name',type:'text',required:true},{key:'modelSerial',label:'Model / Serial No.',type:'text'},{key:'vendorName',label:'Vendor Name',type:'text'},{key:'invoiceNo',label:'Invoice No.',type:'text'},{key:'qtyInwarded',label:'Qty Inwarded',type:'number'},{key:'unitPrice',label:'Unit Price (â¹)',type:'number'},{key:'inwardDate',label:'Inward Date',type:'date'},{key:'receivedBy',label:'Received By',type:'text'},{key:'status',label:'Status',type:'select',options:['Pending','Inwarded','Partial','On Hold','Returned']}],
+  'inward-ce':{title:'Inward CE',shortTitle:'CE Inward',prefix:'INWCE',icon:'\uD83D\uDCE5',color:'#00695C',statusOptions:['Pending','Inwarded','Partial','On Hold','Returned'],
+    fields:[{key:'ceRefNo',label:'CE Ref. No.',type:'text',required:true},{key:'deviceName',label:'CE / Device Name',type:'text',required:true},{key:'modelSerial',label:'Model / Serial No.',type:'text'},{key:'vendorName',label:'Vendor Name',type:'text'},{key:'invoiceNo',label:'Invoice No.',type:'text'},{key:+qtyInwarded',label:'Qty Inwarded',type:'number'},{key:'unitPrice',label:'Unit Price (\u20B9)',type:'number'},{key:'inwardDate',label:'Inward Date',type:'date'},{key:'receivedBy',label:'Received By',type:'text'},{key:'status',label:'Status',type:'select',options:['Pending','Inwarded','Partial','On Hold','Returned']}],
     tableColumns:['id','ceRefNo','deviceName','vendorName','invoiceNo','qtyInwarded','unitPrice','totalValue','inwardDate','receivedBy','status'],
     tableLabels:['ID','CE Ref.','Device Name','Vendor','Invoice','Qty','Unit Price','Total Value','Inward Date','Received By','Status']},
-  'return-vendor':{title:'Return to Vendor',shortTitle:'Return',prefix:'RTV',icon:'â©ï¸',color:'#C65911',statusOptions:['Pending','Returned','Acknowledged','Credit Issued','Rejected'],
-    fields:[{key:'type',label:'Type',type:'select',required:true,options:['Accessory','Consumer Electronics']},{key:'originalRef',label:'Original Ref. No.',type:'text',required:true},{key:'itemName',label:'Item Name',type:'text',required:true},{key:'partCodeModel',label:'Part Code / Model',type:'text'},{key:'vendorName',label:'Vendor Name',type:'text'},{key:'invoiceNo',label:'Invoice No.',type:'text'},{key:'qtyReturned',label:'Qty Returned',type:'number'},{key:'unitPrice',label:'Unit Price (â¹)',type:'number'},{key:'returnDate',label:'Return Date',type:'date'},{key:'returnReason',label:'Return Reason',type:'select',options:['Defective','Wrong Item','Excess Qty','Damaged in Transit','Quality Issue','Other']},{key:'status',label:'Status',type:'select',options:['Pending','Returned','Acknowledged','Credit Issued','Rejected']}],
+  'return-vendor':{title:'Return to Vendor',shortTitle:'Return',prefix:'RTV',icon:'\u21A9\uFE0F',color:'#C65911',statusOptions:['Pending','Returned','Acknowledged','Credit Issued','Rejected'],
+    fields:[{key:'type',label:'Type',type:'select',required:true,options:['Accessory','Consumer Electronics']},{key:'originalRef',label:'Original Ref. No.',type:'text',required:true},{key:'itemName',label:'Item Name',type:'text',required:true},{key:'partCodeModel',label:'Part Code / Model',type:'text'},{key:'vendorName',label:'Vendor Name',type:'text'},{key:'invoiceNo',label:'Invoice No.',type:'text'},{key:'qtyReturned',label:'Qty Returned',type:'number'},{key:'unitPrice',label:'Unit Price (\u20B9)',type:'number'},{key:'returnDate',label:'Return Date',type:'date'},{key:'returnReason',label:'Return Reason',type:'select',options:['Defective','Wrong Item','Excess Qty','Damaged in Transit','Quality Issue','Other']},{key:'status',label:'Status',type:'select',options:['Pending','Returned','Acknowledged','Credit Issued','Rejected']}],
     tableColumns:['id','type','originalRef','itemName','vendorName','invoiceNo','qtyReturned','unitPrice','totalValue','returnDate','returnReason','status'],
     tableLabels:['ID','Type','Ref. No.','Item Name','Vendor','Invoice','Qty','Unit Price','Total Value','Return Date','Reason','Status']},
 };
@@ -190,6 +169,7 @@ const MODULES = {
 const MODULE_KEYS=['approved-acc','inward-acc','approved-ce','inward-ce','return-vendor'];
 const QTY_KEY={'approved-acc':'qtyApproved','inward-acc':'qtyInwarded','approved-ce':'qtyApproved','inward-ce':'qtyInwarded','return-vendor':'qtyReturned'};
 const FB_KEY='svc_fb_cfg_v1';
+const DEFAULT_CFG={apiKey:"AIzaSyD3ADIFSYuvq4gcADggsUKqeEPZgjJhxW0",authDomain:"service-deptmis.firebaseapp.com",projectId:"service-deptmis",storageBucket:"service-deptmis.firebasestorage.app",messagingSenderId:"386218614956",appId:"1:386218614956:web:98988173826fb81bf1bf09",measurementId:"G-6K48SKL5PD"};
 
 let fbApp=null, db=null;
 function initFirebase(cfg){
@@ -201,7 +181,7 @@ function initFirebase(cfg){
 function loadCfg(){ try{ return JSON.parse(localStorage.getItem(FB_KEY)); }catch(_){ return null; } }
 function parseCfg(txt){
   const m=txt.match(/\{[\s\S]*\}/);
-  if(!m) throw new Error('No config object found — paste the full firebaseConfig block');
+  if(!m) throw new Error('No config object found');
   const raw=m[0];
   try{ return JSON.parse(raw); }catch(_){}
   let j=raw.replace(/\/\/[^\n]*/g,'').replace(/('|")([^'"]+)\1\s*:/g,'"$2":').replace(/(\b[a-zA-Z_]\w*)\s*:/g,'"$1":').replace(/'/g,'"').replace(/,\s*([}\]])/g,'$1');
@@ -209,83 +189,19 @@ function parseCfg(txt){
 }
 
 const genId=(prefix,recs)=>{ const max=recs.reduce((m,r)=>{ const n=parseInt((r.id||'').split('-').pop()||'0'); return n>m?n:m; },0); return `${prefix}-${String(max+1).padStart(3,'0')}`; };
-const fmt$=(v)=>(v!=null&&v!=='')? `â¹${Number(v).toLocaleString('en-IN',{minimumFractionDigits:2})}`:'â';
-const fmtN=(v)=>(v!=null&&v!=='')?Number(v).toLocaleString('en-IN'):'â';
+const fmt$=(v)=>(v!=null&&v!=='')?`\u20B9${Number(v).toLocaleString('en-IN',{minimumFractionDigits:2})}`:'--';
+const fmtN=(v)=>(v!=null&&v!=='')?Number(v).toLocaleString('en-IN'):'--';
 const tv=(rec,mk)=>(parseFloat(rec[QTY_KEY[mk]])||0)*(parseFloat(rec.unitPrice)||0);
-const cell=(col,rec,mk)=>{ if(col==='totalValue') return fmt$(tv(rec,mk)); if(col==='unitPrice') return fmt$(rec[col]); if(['qtyApproved','qtyInwarded','qtyReturned'].includes(col)) return fmtN(rec[col]); return rec[col]||'â'; };
+const cell=(col,rec,mk)=>{ if(col==='totalValue') return fmt$(tv(rec,mk)); if(col==='unitPrice') return fmt$(rec[col]); if(['qtyApproved','qtyInwarded','qtyReturned'].includes(col)) return fmtN(rec[col]); return rec[col]||'--'; };
 
-const Badge=({s})=><span className={`status-badge status-${(s||'').replace(/\s+/g,'-')}`}>{s||'â'}</span>;
-const Toast=({msg,type,onDone})=>{ useEffect(()=>{ const t=setTimeout(onDone,3000); return()=>clearTimeout(t); },[]); return <div className={`toast ${type}`}>{{success:'â',error:'â',info:'â¹ï¸'}[type]||'â'} {msg}</div>; };
+const Badge=({s})=><span className={`status-badge status-${(s||'').replace(/\s+/g,'-')}`}>{s||'--'}</span>;
+const Toast=({msg,type,onDone})=>{ useEffect(()=>{ const t=setTimeout(onDone,3000); return()=>clearTimeout(t); },[]); return <div className={`toast ${type}`}>{ {success:'OK',error:'ERR',info:'i'}[type]||'*' } {msg}</div>; };
 const SpinSm=()=><div className="spinner-sm dark" style={{display:'inline-block'}}></div>;
 
-// ââ Setup âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-const Setup=({onDone})=>{
-  const [cfg,setCfg]=useState('');
-  const [testing,setTesting]=useState(false);
-  const [res,setRes]=useState(null);
-
-  const test=async()=>{
-    setTesting(true); setRes(null);
-    try{
-      const parsed=parseCfg(cfg);
-      initFirebase(parsed);
-      await db.collection('_ping').doc('t').set({t:Date.now()});
-      await db.collection('_ping').doc('t').delete();
-      setRes({ok:true,msg:'â Firebase connected!'});
-    }catch(e){ setRes({ok:false,msg:'â '+e.message}); }
-    setTesting(false);
-  };
-
-  return(
-    <div className="setup-screen">
-      <div className="setup-card">
-        <div className="setup-header">
-          <div style={{fontSize:48,marginBottom:8}}>ð¥</div>
-          <h1>Connect to Firebase</h1>
-          <p>Your data will sync in real-time across all devices â free forever</p>
-        </div>
-        <div className="setup-body">
-          <div className="setup-steps">
-            <div className="setup-step"><div className="step-num">1</div><div className="step-body">
-              <h4>Create a Firebase project</h4>
-              <p>Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> â <b>Add project</b> â name it (e.g. "service-dept") â click through to create it.</p>
-            </div></div>
-            <div className="setup-step"><div className="step-num">2</div><div className="step-body">
-              <h4>Add a Web App &amp; copy the config</h4>
-              <p>In your Firebase project â click the <b>Web icon &lt;/&gt;</b> â give it a nickname â <b>Register app</b> â copy the <b>firebaseConfig</b> object shown (the part inside curly braces).</p>
-            </div></div>
-            <div className="setup-step"><div className="step-num">3</div><div className="step-body">
-              <h4>Create Firestore Database</h4>
-              <p>In Firebase Console â <b>Build â Firestore Database â Create database</b> â choose <b>Start in test mode</b> â select your region â <b>Enable</b>.</p>
-            </div></div>
-            <div className="setup-step"><div className="step-num">4</div><div className="step-body">
-              <h4>Paste your firebaseConfig below &amp; test</h4>
-              <textarea className={`config-area${res?(res.ok?' valid':' invalid'):''}`}
-                placeholder={`Paste the firebaseConfig block here:\n{\n  apiKey: "AIzaSy...",\n  authDomain: "your-app.firebaseapp.com",\n  projectId: "your-app-id",\n  storageBucket: "your-app.appspot.com",\n  messagingSenderId: "123456",\n  appId: "1:123:web:abc"\n}`}
-                value={cfg} onChange={e=>{setCfg(e.target.value);setRes(null);}}/>
-              <div className="test-row">
-                <button className="btn btn-firebase" onClick={test} disabled={testing||!cfg.trim()}>
-                  {testing?<><SpinSm/> Testingâ¦</>:'ð Test Connection'}
-                </button>
-                {res&&<span className={`test-result ${res.ok?'ok':'fail'}`}>{res.msg}</span>}
-              </div>
-            </div></div>
-          </div>
-          <button className="btn btn-firebase" style={{width:'100%',justifyContent:'center',padding:'14px',fontSize:15}}
-            onClick={()=>res?.ok&&onDone()} disabled={!res?.ok}>
-            {res?.ok?'ð Launch App':'Test connection first to continue'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ââ Add/Edit Modal ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const Modal=({title,onClose,children,footer})=>(
   <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
     <div className="modal">
-      <div className="modal-header"><h3>{title}</h3><button className="modal-close" onClick={onClose}>Ã</button></div>
+      <div className="modal-header"><h3>{title}</h3><button className="modal-close" onClick={onClose}>&times;</button></div>
       <div className="modal-body">{children}</div>
       {footer&&<div className="modal-footer">{footer}</div>}
     </div>
@@ -299,10 +215,10 @@ const RecordForm=({mk,rec,onSave,onClose,saving})=>{
   const validate=()=>{ const e={}; mod.fields.filter(f=>f.required).forEach(f=>{ if(!form[f.key]||!String(form[f.key]).trim()) e[f.key]='Required'; }); setErrs(e); return !Object.keys(e).length; };
   const total=tv(form,mk);
   return(
-    <Modal title={rec?`Edit â ${rec.id}`:`Add New ${mod.title}`} onClose={onClose}
+    <Modal title={rec?`Edit -- ${rec.id}`:`Add New ${mod.title}`} onClose={onClose}
       footer={<><button className="btn btn-outline" onClick={onClose} disabled={saving}>Cancel</button>
         <button className="btn btn-firebase" onClick={()=>validate()&&onSave(form)} disabled={saving}>
-          {saving?<><SpinSm/> Savingâ¦</>:rec?'Save Changes':'Add Record'}
+          {saving?<><SpinSm/> Saving...</>:rec?'Save Changes':'Add Record'}
         </button></>}>
       <div className="form-grid">
         {mod.fields.map(f=>(
@@ -310,7 +226,7 @@ const RecordForm=({mk,rec,onSave,onClose,saving})=>{
             <label className={`form-label${f.required?' required':''}`}>{f.label}</label>
             {f.type==='select'
               ?<select className="form-select" value={form[f.key]} onChange={e=>setForm(p=>({...p,[f.key]:e.target.value}))}>
-                <option value="">â Select â</option>{f.options.map(o=><option key={o}>{o}</option>)}</select>
+                <option value="">-- Select --</option>{f.options.map(o=><option key={o}>{o}</option>)}</select>
               :<input className={`form-input${errs[f.key]?' error':''}`} type={f.type} value={form[f.key]} onChange={e=>setForm(p=>({...p,[f.key]:e.target.value}))}/>}
             {errs[f.key]&&<span className="form-error">{errs[f.key]}</span>}
           </div>
@@ -322,7 +238,6 @@ const RecordForm=({mk,rec,onSave,onClose,saving})=>{
   );
 };
 
-// ââ Module Page âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const ModulePage=({mk,records,onAdd,onEdit,onDelete,showToast})=>{
   const mod=MODULES[mk];
   const [search,setSrch]=useState('');
@@ -354,12 +269,12 @@ const ModulePage=({mk,records,onAdd,onEdit,onDelete,showToast})=>{
     <div>
       {form&&<RecordForm mk={mk} rec={editR} onSave={save} onClose={()=>{setForm(false);setEditR(null);}} saving={saving}/>}
       {delId&&<div className="confirm-overlay"><div className="confirm-box">
-        <div className="confirm-icon">ðï¸</div>
+        <div className="confirm-icon">\uD83D\uDDD1</div>
         <div className="confirm-title">Delete Record?</div>
         <div className="confirm-msg">Permanently remove <strong>{delId}</strong> from Firebase. This cannot be undone.</div>
         <div className="confirm-btns">
           <button className="btn btn-outline" onClick={()=>setDelId(null)} disabled={deling}>Cancel</button>
-          <button className="btn btn-danger" onClick={doDel} disabled={deling}>{deling?<><SpinSm/> Deletingâ¦</>:'Delete'}</button>
+          <button className="btn btn-danger" onClick={doDel} disabled={deling}>{deling?<><SpinSm/> Deleting...</>:'Delete'}</button>
         </div>
       </div></div>}
 
@@ -369,17 +284,17 @@ const ModulePage=({mk,records,onAdd,onEdit,onDelete,showToast})=>{
           <span className="module-badge" style={{background:mod.color}}>{records.length} records</span>
         </div>
         <div className="module-actions">
-          <button className="btn btn-success" onClick={exportXL}>â¬ Export Excel</button>
-          <button className="btn btn-firebase" onClick={()=>{setEditR(null);setForm(true);}}>ï¼ Add Record</button>
+          <button className="btn btn-success" onClick={exportXL}>&#8659; Export Excel</button>
+          <button className="btn btn-firebase" onClick={()=>{setEditR(null);setForm(true);}}>+ Add Record</button>
         </div>
       </div>
 
       <div className="filters-bar">
-        <input className="filter-input" placeholder="ð Search all fieldsâ¦" value={search} onChange={e=>setSrch(e.target.value)}/>
+        <input className="filter-input" placeholder="Search all fields..." value={search} onChange={e=>setSrch(e.target.value)}/>
         <select className="filter-select" value={stF} onChange={e=>setStF(e.target.value)}>
           <option value="">All Status</option>{mod.statusOptions.map(s=><option key={s}>{s}</option>)}
         </select>
-        {(search||stF)&&<button className="filter-clear" onClick={()=>{setSrch('');setStF('');}}>â Clear</button>}
+        {(search||stF)&&<button className="filter-clear" onClick={()=>{setSrch('');setStF('');}}>&#10005; Clear</button>}
         <span style={{marginLeft:'auto',fontSize:12,color:'#888'}}>{filtered.length} of {records.length}</span>
       </div>
 
@@ -393,13 +308,13 @@ const ModulePage=({mk,records,onAdd,onEdit,onDelete,showToast})=>{
             <thead><tr>{mod.tableLabels.map((l,i)=><th key={i}>{l}</th>)}<th>Actions</th></tr></thead>
             <tbody>
               {filtered.length===0
-                ?<tr><td colSpan={mod.tableLabels.length+1} className="table-empty"><span className="empty-icon">ð</span>No records â click <b>ï¼ Add Record</b> to start</td></tr>
+                ?<tr><td colSpan={mod.tableLabels.length+1} className="table-empty"><span className="empty-icon">\uD83D\uDCCB</span>No records -- click <b>Add Record</b> to start</td></tr>
                 :filtered.map(r=>(
                   <tr key={r.id}>
                     {mod.tableColumns.map(c=><td key={c}>{c==='id'?<span className="id-chip">{r.id}</span>:c==='status'?<Badge s={r.status}/>:cell(c,r,mk)}</td>)}
                     <td><div className="action-btns">
-                      <button className="btn btn-outline btn-sm btn-icon" onClick={()=>{setEditR(r);setForm(true);}}>âï¸</button>
-                      <button className="btn btn-danger btn-sm btn-icon" onClick={()=>setDelId(r.id)}>ð</button>
+                      <button className="btn btn-outline btn-sm btn-icon" title="Edit" onClick={()=>{setEditR(r);setForm(true);}}>&#9998;</button>
+                      <button className="btn btn-danger btn-sm btn-icon" title="Delete" onClick={()=>setDelId(r.id)}>\uD83D\uDDD1</button>
                     </div></td>
                   </tr>
                 ))
@@ -418,7 +333,6 @@ const ModulePage=({mk,records,onAdd,onEdit,onDelete,showToast})=>{
   );
 };
 
-// ââ Chart âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const BarChart=({mk,records,color})=>{
   const ref=useRef(null),chart=useRef(null);
   const mod=MODULES[mk];
@@ -434,7 +348,6 @@ const BarChart=({mk,records,color})=>{
   return <canvas ref={ref}/>;
 };
 
-// ââ Dashboard âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const Dashboard=({data})=>{
   const C={'approved-acc':'#1F3864','inward-acc':'#2E75B6','approved-ce':'#375623','inward-ce':'#00695C','return-vendor':'#C65911'};
   const today=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
@@ -442,8 +355,8 @@ const Dashboard=({data})=>{
   return(
     <div>
       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20,flexWrap:'wrap',gap:10}}>
-        <div><h2 style={{fontSize:22,fontWeight:800,color:'#1F3864'}}>Management Dashboard</h2><p style={{color:'#888',fontSize:13}}>ð¥ Real-time sync via Firebase</p></div>
-        <span className="badge-date">ð {today}</span>
+        <div><h2 style={{fontSize:22,fontWeight:800,color:'#1F3864'}}>Management Dashboard</h2><p style={{color:'#888',fontSize:13}}>\uD83D\uDD25 Real-time sync via Firebase</p></div>
+        <span className="badge-date">\uD83D\uDCC5 {today}</span>
       </div>
       <div className="kpi-grid">
         {stats.map(({key,mod,r,pending,done,v})=>(
@@ -455,17 +368,17 @@ const Dashboard=({data})=>{
               <span className="kpi-chip status-Pending">{pending} pending</span>
               <span className="kpi-chip status-Approved">{done} done</span>
             </div>
-            {v>0&&<div style={{marginTop:6,fontSize:11,fontWeight:700,color:C[key]}}>â¹{Math.round(v).toLocaleString('en-IN')}</div>}
+            {v>0&&<div style={{marginTop:6,fontSize:11,fontWeight:700,color:C[key]}}>\u20B9{Math.round(v).toLocaleString('en-IN')}</div>}
           </div>
         ))}
       </div>
       <div className="pipeline-card">
-        <div className="pipeline-title">â¡ Workflow Pipeline</div>
+        <div className="pipeline-title">&#9889; Workflow Pipeline</div>
         <div className="pipeline-steps">
           {stats.map(({key,mod,r},i)=>(
             <React.Fragment key={key}>
               <div className="pipe-step" style={{background:C[key]}}><span className="pipe-count">{r.length}</span>{mod.shortTitle}</div>
-              {i<stats.length-1&&<div className="pipe-arrow">â</div>}
+              {i<stats.length-1&&<div className="pipe-arrow">&rarr;</div>}
             </React.Fragment>
           ))}
         </div>
@@ -482,9 +395,7 @@ const Dashboard=({data})=>{
   );
 };
 
-// ââ App âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const App=()=>{
-  const [setup,setSetup]=useState(false);
   const [ready,setReady]=useState(false);
   const [data,setData]=useState({});
   const [page,setPage]=useState('dashboard');
@@ -504,11 +415,11 @@ const App=()=>{
     );
   },[]);
 
-  const launch=()=>{ setSetup(true); MODULE_KEYS.forEach(mk=>subscribe(mk)); setTimeout(()=>setReady(true),1000); };
+  const launch=()=>{ MODULE_KEYS.forEach(mk=>subscribe(mk)); setTimeout(()=>setReady(true),1000); };
 
   useEffect(()=>{
-    const cfg=loadCfg();
-    if(cfg){ try{ initFirebase(cfg); launch(); }catch(_){ localStorage.removeItem(FB_KEY); } }
+    const cfg=loadCfg()||DEFAULT_CFG;
+    try{ initFirebase(cfg); launch(); }catch(_){ localStorage.removeItem(FB_KEY); }
   },[]);
 
   useEffect(()=>()=>{ Object.values(unsubs.current).forEach(u=>u&&u()); },[]);
@@ -516,25 +427,22 @@ const App=()=>{
   const handleAdd=async(mk,form)=>{ const id=genId(MODULES[mk].prefix,data[mk]||[]); await db.collection(mk).doc(id).set({...form,id,createdAt:new Date().toISOString()}); };
   const handleEdit=async(mk,u)=>{ await db.collection(mk).doc(u.id).set({...u,updatedAt:new Date().toISOString()}); };
   const handleDelete=async(mk,id)=>{ await db.collection(mk).doc(id).delete(); };
-  const disconnect=()=>{ if(window.confirm('Disconnect and change Firebase project?')){ localStorage.removeItem(FB_KEY); Object.values(unsubs.current).forEach(u=>u&&u()); window.location.reload(); } };
 
-  if(!setup) return <Setup onDone={launch}/>;
   if(!ready) return(
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:16,background:'#f0f2f5'}}>
-      <div style={{fontSize:48}}>ð¥</div>
+      <div style={{fontSize:48}}>\uD83D\uDD25</div>
       <div className="spinner"></div>
-      <p style={{color:'#666'}}>Connecting to Firebaseâ¦</p>
+      <p style={{color:'#666'}}>Connecting to Firebase...</p>
     </div>
   );
 
   const nav=[
-    {key:'dashboard',label:'Dashboard',icon:'ð',sec:'Overview'},
-    {key:'approved-acc',label:'Approved Accessories',icon:'ð§',sec:'Accessories',badge:(data['approved-acc']||[]).length},
-    {key:'inward-acc',label:'Inward Accessories',icon:'ð¦',badge:(data['inward-acc']||[]).length},
-    {key:'approved-ce',label:'Approved CE',icon:'ðº',sec:'Consumer Electronics',badge:(data['approved-ce']||[]).length},
-    {key:'inward-ce',label:'Inward CE',icon:'ð¥',badge:(data['inward-ce']||[]).length},
-    {key:'return-vendor',label:'Return to Vendor',icon:'â©ï¸',sec:'Returns',badge:(data['return-vendor']||[]).length},
-    {key:'__dis',label:'Change Firebase',icon:'âï¸',sec:'Settings'},
+    {key:'dashboard',label:'Dashboard',icon:'\uD83D\uDCCA',sec:'Overview'},
+    {key:'approved-acc',label:'Approved Accessories',icon:'\uD83D\uDD27',sec:'Accessories',badge:(data['approved-acc']||[]).length},
+    {key:'inward-acc',label:'Inward Accessories',icon:'\uD83D\uDCE6',badge:(data['inward-acc']||[]).length},
+    {key:'approved-ce',label:'Approved CE',icon:'\uD83D\uDCFA',sec:'Consumer Electronics',badge:(data['approved-ce']||[]).length},
+    {key:'inward-ce',label:'Inward CE',icon:'\uD83D\uDCE5',badge:(data['inward-ce']||[]).length},
+    {key:'return-vendor',label:'Return to Vendor',icon:'\u21A9\uFE0F',sec:'Returns',badge:(data['return-vendor']||[]).length},
   ];
   const PT=page==='dashboard'?{t:'Dashboard',s:'Real-time overview via Firebase'}:{t:MODULES[page]?.title||'',s:'Changes sync instantly to all users'};
 
@@ -542,9 +450,9 @@ const App=()=>{
     <div className="layout">
       <div className={`sidebar${collapsed?' collapsed':''}`}>
         <div className="sidebar-logo">
-          <div className="logo-icon">ð¥</div>
+          <div className="logo-icon">\uD83D\uDD25</div>
           {!collapsed&&<div className="logo-text">Service Dept.<span>Firebase Edition</span></div>}
-          <button className="sidebar-toggle" onClick={()=>setCollapsed(c=>!c)}>{collapsed?'â¶':'â'}</button>
+          <button className="sidebar-toggle" onClick={()=>setCollapsed(c=>!c)}>{collapsed?'&#9654;':'&#9664;'}</button>
         </div>
         <nav>
           {nav.map((item,i)=>{
@@ -553,7 +461,7 @@ const App=()=>{
             return(
               <React.Fragment key={item.key}>
                 {showS&&!collapsed&&<div className="nav-section">{item.sec}</div>}
-                <div className={`nav-item${page===item.key?' active':''}`} onClick={()=>item.key==='__dis'?disconnect():setPage(item.key)}>
+                <div className={`nav-item${page===item.key?' active':''}`} onClick={()=>setPage(item.key)}>
                   <span className="nav-icon">{item.icon}</span>
                   <span className="nav-label">{item.label}</span>
                   {item.badge>0&&<span className="nav-badge">{item.badge}</span>}
@@ -562,7 +470,7 @@ const App=()=>{
             );
           })}
         </nav>
-        {!collapsed&&<div className="sidebar-footer">ð¥ Powered by Firebase</div>}
+        {!collapsed&&<div className="sidebar-footer">\uD83D\uDD25 Powered by Firebase</div>}
       </div>
 
       <div className={`main${collapsed?' shifted':''}`}>
@@ -571,7 +479,7 @@ const App=()=>{
           <div className="topbar-actions">
             <span className={`live-badge ${live?'connected':'offline'}`}>
               <span className="live-dot"></span>
-              {live?'Live â Firebase Connected':'Reconnectingâ¦'}
+              {live?'Live -- Firebase Connected':'Reconnecting...'}
             </span>
             <span className="badge-date">{new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</span>
           </div>
