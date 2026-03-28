@@ -201,8 +201,10 @@ function initFirebase(cfg){
 function loadCfg(){ try{ return JSON.parse(localStorage.getItem(FB_KEY)); }catch(_){ return null; } }
 function parseCfg(txt){
   const m=txt.match(/\{[\s\S]*\}/);
-  if(!m) throw new Error('No config object found â paste the full firebaseConfig block');
-  let j=m[0].replace(/\/\/[^\n]*/g,'').replace(/(\b[a-zA-Z_]\w*)\s*:/g,'"$1":').replace(/'/g,'"').replace(/,\s*([}\]])/g,'$1');
+  if(!m) throw new Error('No config object found — paste the full firebaseConfig block');
+  const raw=m[0];
+  try{ return JSON.parse(raw); }catch(_){}
+  let j=raw.replace(/\/\/[^\n]*/g,'').replace(/('|")([^'"]+)\1\s*:/g,'"$2":').replace(/(\b[a-zA-Z_]\w*)\s*:/g,'"$1":').replace(/'/g,'"').replace(/,\s*([}\]])/g,'$1');
   return JSON.parse(j);
 }
 
